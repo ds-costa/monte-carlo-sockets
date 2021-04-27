@@ -29,22 +29,18 @@ $> sudo apt install cmake
 ```bash
 $> mkdir build
 ```
-- Open the folder.
-```bash
-$> cd build
-```
 - Run cmake.
 ```bash
-$build> cmake ..
+$> cmake build
 ```
 - Run make.
 ```bash
-$build> make
+$> make -C build
 ```
 - Execute the compiled project.
 ```bash
-$build> ./server
-$build> ./client 
+$> ./build/server
+$> ./build/client 
 ```
 
 ## Authors
