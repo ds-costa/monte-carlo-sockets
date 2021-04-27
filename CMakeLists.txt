@@ -14,3 +14,7 @@ target_link_libraries(server -lm)
 if (WIN32)
     target_link_libraries(MonteCarloSockets -lwsock32)
 endif (WIN32)
+
+# target_compile_options(client PRIVATE  -Wall -Wextra)
+target_compile_options(client PRIVATE -Wall -Wextra)
+target_compile_options(server PRIVATE -Wall -Wextra)
