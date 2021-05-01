@@ -8,9 +8,12 @@ add_library(socketconfig src/socketconfig.c)
 
 add_executable(client client.c)
 add_executable(server server.c)
+add_executable(standalone standalone.c)
+
 
 target_link_libraries(client socketconfig -lm)
 target_link_libraries(server socketconfig -lm)
+target_link_libraries(standalone -lm)
 
 if (WIN32)
     target_link_libraries(MonteCarloSockets -lwsock32)
@@ -19,3 +22,4 @@ endif (WIN32)
 # target_compile_options(client PRIVATE  -Wall -Wextra)
 target_compile_options(client PRIVATE -Wall -Wextra)
 target_compile_options(server PRIVATE -Wall -Wextra)
+target_compile_options(standalone PRIVATE -Wall -Wextra)
