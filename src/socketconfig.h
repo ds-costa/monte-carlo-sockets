@@ -1,21 +1,6 @@
 #ifndef SOCKET_CONFIG
 #define SOCKET_CONFIG
 
-#define IPV4 AF_INET
-#define TCP SOCK_STREAM
-#define LISTEN_QUENUE_LENGTH 16
-#define PORT 5000
-
-#define MAX_CLIENTS 16
-
-#include <stdio.h>
-#include<stdlib.h>
-#include <stdbool.h>
-#include <sys/socket.h> 
-#include <netinet/in.h>
-#include <strings.h>
-#include <errno.h>
-
 typedef struct {
     //[!] ainda precisa adicionar informação para ter controle de x clientes
     //[!] no código do thiago leal fica na struct SocketSet
@@ -28,13 +13,13 @@ typedef struct {
 
 /**
  * function: scof_get_address_host
- * Writes to the array the (int) content read in the stdin
+ * Return a socket address (IPV4, PORT, INADDR_ANY)
  */
 struct sockaddr_in scof_get_address_host();
 
 /**
  * function: scof_create_default_connection_type
- * Writes to the array the (int) content read in the stdin
+ * Create a socket with the default configuration
  */
 socketdata_t scof_create_default_connection_type();
 
