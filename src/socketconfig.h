@@ -2,9 +2,7 @@
 #define SOCKET_CONFIG
 
 typedef struct {
-    //[!] ainda precisa adicionar informação para ter controle de x clientes
-    //[!] no código do thiago leal fica na struct SocketSet
-    //[!] não adicionei pq a gente pode fazer diferente
+    //[!] need to add structure to keep following the client 
     struct sockaddr_in address;
     int file_descriptor;
     int address_size;
