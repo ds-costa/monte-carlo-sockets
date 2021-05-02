@@ -1,6 +1,13 @@
 #ifndef SOCKET_CONFIG
 #define SOCKET_CONFIG
 
+#define IPV4 AF_INET
+#define TCP SOCK_STREAM
+#define LISTEN_QUENUE_LENGTH 16
+#define PORT 5000
+
+#define MAX_CLIENTS 16
+
 typedef struct {
     //[!] need to add structure to keep following the client 
     struct sockaddr_in address;
