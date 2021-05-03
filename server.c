@@ -4,11 +4,10 @@
 #include "src/socketconfig.h"
 
 int main(int argc, char **argv) {
-    //socketdata_t sock;
-
-    //sock = scof_create_default_connection_type();
-    scof_activate_listener_mode(&sock);
+ 
+    socketdata_t server_socket;    
+    server_socket = scof_create_default_connection_type();
+    scof_activate_listener_mode(&server_socket);
     
-    printf("Hello Server...\n");
     return 0;
 }

@@ -1,6 +1,9 @@
 #ifndef SOCKET_CONFIG
 #define SOCKET_CONFIG
 
+#include <sys/socket.h> 
+#include <netinet/in.h>
+
 #define IPV4 AF_INET
 #define TCP SOCK_STREAM
 #define LISTEN_QUENUE_LENGTH 16
