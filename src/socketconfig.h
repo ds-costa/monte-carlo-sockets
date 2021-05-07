@@ -20,22 +20,22 @@ typedef struct {
 } socketdata_t;
 
 /**
- * function: scof_get_address_host
+ * function: sc_new_socket_adress
  * Return a socket address (IPV4, PORT, INADDR_ANY)
  */
-struct sockaddr_in scof_get_address_host();
+struct sockaddr_in sc_new_socket_adress();
 
 /**
- * function: scof_create_default_connection_type
+ * function: sc_new_socket_data
  * Create a socket with the default configuration
  */
-socketdata_t scof_create_default_connection_type();
+socketdata_t sc_new_socket_data();
 
 /**
- * function: scof_activate_listener_mode
+ * function: sc_activate_listener_mode
  * Creates, set the option, bind, define listen quenue lenght of listener socket
  * @param sock, Socket struct with all information 
  */
-int scof_activate_listener_mode(socketdata_t* sock);
+int sc_activate_listener_mode(socketdata_t* sock);
 
 #endif
