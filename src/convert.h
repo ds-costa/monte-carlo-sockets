@@ -1,5 +1,5 @@
 /**
- * function: conv_n_points_2_string
+ * function: conv_points_2_string
  * Converts the quantity of points into a vector of char
  * @param points, Holds the quantity of points 
  * @param buffer, Vector that will receive the convertion  
