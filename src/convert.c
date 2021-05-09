@@ -19,9 +19,9 @@ void conv_double_2_string(double number, char* buffer) {
     sprintf(buffer, "%.10lf", number);
 }
 
-double conv_double_2_pi(char* buffer) {
-    double pi;
-    pi = strtod(buffer, NULL);
+double conv_string_2_double(char* buffer) {
+    double number;
+    number = strtod(buffer, NULL);
 
-    return pi;
+    return number;
 }
