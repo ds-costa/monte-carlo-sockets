@@ -4,15 +4,15 @@
 #include <string.h>
 #include <string.h>
 
-void conv_points_2_string(unsigned long points, char* buffer) {
-    sprintf(buffer, "%lu", points);
+void conv_ulong_2_string(unsigned long number, char* buffer) {
+    sprintf(buffer, "%lu", number);
 }
 
-unsigned long conv_string_2_points(char* buffer) {
-    unsigned long points;
-    points = strtod(buffer, NULL);
+unsigned long conv_string_2_ulong(char* buffer) {
+    unsigned long number;
+    number = strtod(buffer, NULL);
     
-    return points;
+    return number;
 }
 
 void conv_double_2_string(double number, char* buffer) {
