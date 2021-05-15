@@ -34,13 +34,26 @@ typedef struct {
  * function: sc_new_socket_adress
  * Return a socket address (IPV4, PORT, INADDR_ANY)
  */
-struct sockaddr_in sc_new_socket_adress();
+struct sockaddr_in sc_new_socket_adress_server();
+
+/**
+ * function: sc_new_socket_adress
+ * Return a socket address (IPV4, PORT, INADDR_ANY)
+ */
+struct sockaddr_in sc_new_socket_adress_client();
+
 
 /**
  * function: sc_new_socket_data
  * Create a socket with the default configuration
  */
-socketdata_t sc_new_socket_data();
+socketdata_t sc_new_socket_data_server();
+
+/**
+ * function: sc_new_socket_data
+ * Create a socket with the default configuration
+ */
+socketdata_t sc_new_socket_data_client();
 
 /**
  * function: sc_activate_listener_mode

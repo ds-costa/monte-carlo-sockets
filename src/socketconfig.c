@@ -6,7 +6,7 @@
  * function: sc_new_socket_adress
  * Return a socket address (IPV4, PORT, INADDR_ANY)
  */
-struct sockaddr_in sc_new_socket_adress() {
+struct sockaddr_in sc_new_socket_adress_server() {
     struct sockaddr_in server_addr;
 
     server_addr.sin_family = IPV4;
@@ -18,18 +18,48 @@ struct sockaddr_in sc_new_socket_adress() {
 }
 
 /**
+ * function: sc_new_socket_adress
+ * Return a socket address (IPV4, PORT, INADDR_ANY)
+ */
+struct sockaddr_in sc_new_socket_adress_client() {
+    struct sockaddr_in server_addr;
+
+    server_addr.sin_family = IPV4;
+    server_addr.sin_port = htons(PORT); // host-endian to network-endian
+    server_addr.sin_addr.s_addr = inet_addr(HOME_IP);
+    bzero(&(server_addr.sin_zero),8);
+
+    return server_addr;
+}
+
+/**
  * function: sc_new_socket_data
  * Create a socketdata_t ADT with the default socket configuration (IPV4, Port 5000)
  */
-socketdata_t sc_new_socket_data(){
+socketdata_t sc_new_socket_data_server(){
     socketdata_t sock;
     
     sock.file_descriptor = -1;
     sock.option_name = true;
-    sock.address = sc_new_socket_adress();
+    sock.address = sc_new_socket_adress_server();
 
     return sock;
 }
+
+/**
+ * function: sc_new_socket_data
+ * Create a socketdata_t ADT with the default socket configuration (IPV4, Port 5000)
+ */
+socketdata_t sc_new_socket_data_client(){
+    socketdata_t sock;
+    
+    sock.file_descriptor = -1;
+    sock.option_name = true;
+    sock.address = sc_new_socket_adress_client();
+
+    return sock;
+}
+
 
 /**
  * function: sc_activate_listener_mode
