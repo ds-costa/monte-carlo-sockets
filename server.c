@@ -7,8 +7,8 @@
 
 int main(int argc, char **argv) {
  
-    socketdata_t server_socket;    
-    int number_of_clients = 2;
+    socketdata_t server_socket, client_socket;    
+    int number_of_clients = 5;
     int i;
     unsigned long number_points = 5000000000;
     //read(n_clients)
@@ -19,17 +19,19 @@ int main(int argc, char **argv) {
     server_socket = sc_new_socket_data_server();
     sc_activate_listener_mode(&server_socket);
     
+	struct sockaddr_in newAddr;
+    socklen_t addr_size;
 
     for(i = 0; i < number_of_clients; i++) {
         system("./client &");
         clients[i] = accept(
             server_socket.file_descriptor, 
-            (struct sockaddr *)&server_socket.address, 
-            (socklen_t *)sizeof(server_socket.address)
+            (struct sockaddr *)&newAddr, 
+            &addr_size
         );
         pipe(clients_pipes[i]);
 
-        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(server_socket.address.sin_addr), ntohs(server_socket.address.sin_port));
+        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
     }
     //conectado
     //lê/tem que ter number_points

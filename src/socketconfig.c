@@ -23,7 +23,7 @@ struct sockaddr_in sc_new_socket_adress_server() {
  */
 struct sockaddr_in sc_new_socket_adress_client() {
     struct sockaddr_in server_addr;
-
+    struct hostent *host;
     server_addr.sin_family = IPV4;
     server_addr.sin_port = htons(PORT); // host-endian to network-endian
     server_addr.sin_addr.s_addr = inet_addr(HOME_IP);
