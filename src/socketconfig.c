@@ -1,11 +1,5 @@
 #include "socketconfig.h"
-#include <stdio.h>
-#include<stdlib.h>
-#include <stdbool.h>
-#include <sys/socket.h> 
-#include <netinet/in.h>
-#include <strings.h>
-#include <errno.h>
+
 
 
 /**
@@ -49,7 +43,7 @@ int sc_activate_listener_mode(socketdata_t* sock) {
     sock->file_descriptor = socket(IPV4, TCP, 0);
 
     if(sock->file_descriptor == -1) {
-        perror("[-]Error creating Socket\n");
+        perror("[-] Server> Error creating Socket\n");
         exit(1);
     }
 
@@ -69,5 +63,32 @@ int sc_activate_listener_mode(socketdata_t* sock) {
     }
 
     printf("\n[+]TCP Server created! Waiting client at port: %d\n", PORT);
+    return sock->file_descriptor;
+}
+
+/**
+ * function: sc_establish_client_connection
+ * @param sock, Socket struct with all information 
+ */
+int sc_establish_client_connection(socketdata_t *sock) {
+
+    sock->file_descriptor = socket(IPV4, TCP, 0);
+
+    if(sock->file_descriptor == -1) {
+        perror("[-] Client> Error creating Socket\n");
+        exit(1);
+    }
+
+    // Converte ipv4 e ipv6 para forma binária 
+    if(inet_pton(AF_INET, HOME_IP, &sock->address.sin_addr) <= 0)   { 
+        fprintf(stderr,"invalid adress"); 
+        exit(EXIT_FAILURE); 
+    } 
+   
+    if (connect(sock->file_descriptor, (struct sockaddr *)&sock->address, sizeof(sock->address)) < 0) { 
+        fprintf(stderr,"Conection failed");
+        exit(EXIT_FAILURE);     
+    }
+
     return sock->file_descriptor;
 }

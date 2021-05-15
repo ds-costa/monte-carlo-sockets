@@ -3,6 +3,14 @@
 
 #include <sys/socket.h> 
 #include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <sys/socket.h> 
+#include <netinet/in.h>
+#include <arpa/inet.h> 
+#include <strings.h>
+#include <errno.h>
 
 #define IPV4 AF_INET
 #define TCP SOCK_STREAM
@@ -10,6 +18,9 @@
 #define PORT 5000
 
 #define MAX_CLIENTS 16
+
+#define MAX_BUFFER_LENGTH 1024 // 1kb
+#define HOME_IP "127.0.0.1"
 
 typedef struct {
     //[!] need to add structure to keep following the client 
@@ -37,5 +48,13 @@ socketdata_t sc_new_socket_data();
  * @param sock, Socket struct with all information 
  */
 int sc_activate_listener_mode(socketdata_t* sock);
+
+
+/**
+ * function: sc_establish_client_connection
+ * @param sock, Socket struct with all information 
+ */
+int sc_establish_client_connection(socketdata_t *sock);
+
 
 #endif
