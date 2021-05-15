@@ -4,6 +4,7 @@
 #include <math.h>
 #include "src/socketconfig.h"
 #include "src/convert.h"
+#include "src/data.h"
 
 int main(int argc, char **argv) {
  
@@ -11,17 +12,14 @@ int main(int argc, char **argv) {
     int number_of_clients = 5;
     int i;
     unsigned long number_points = 5000000000;
-    //read(n_clients)
-    
+    struct sockaddr_in newAddr;
+    socklen_t addr_size;
     int clients[number_of_clients];
     pipe_t clients_pipes[number_of_clients];
 
     server_socket = sc_new_socket_data_server();
     sc_activate_listener_mode(&server_socket);
     
-	struct sockaddr_in newAddr;
-    socklen_t addr_size;
-
     for(i = 0; i < number_of_clients; i++) {
         system("./client &");
         clients[i] = accept(
@@ -33,12 +31,19 @@ int main(int argc, char **argv) {
 
         printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
     }
-    //conectado
-    //lê/tem que ter number_points
-    
+
+    char *test_buffer[] = {
+        "Brazil",
+        "Japan",
+        "EUA",
+        "Germany",
+        "Bahia"
+    };
+
     for(i = 0; i < number_of_clients; i++) {
-    
+        data_send(clients[i], test_buffer[i]);
     }
+
     // unsigned int child_process_counter = 0;
     // pid_t child_pid;
 
@@ -54,7 +59,7 @@ int main(int argc, char **argv) {
     //         exit(0);
     //     }
     // }
-
+    close(server_socket.file_descriptor);
 
     return 0;
 }
