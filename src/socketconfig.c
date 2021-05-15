@@ -3,7 +3,7 @@
 
 
 /**
- * function: sc_new_socket_adress
+ * function: sc_new_socket_client
  * Return a socket address (IPV4, PORT, INADDR_ANY)
  */
 struct sockaddr_in sc_new_socket_adress_server() {
@@ -18,8 +18,8 @@ struct sockaddr_in sc_new_socket_adress_server() {
 }
 
 /**
- * function: sc_new_socket_adress
- * Return a socket address (IPV4, PORT, INADDR_ANY)
+ * function: sc_new_socket_adress_client
+ * Return a socket address (IPV4, PORT, HOME_IP)
  */
 struct sockaddr_in sc_new_socket_adress_client() {
     struct sockaddr_in server_addr;
@@ -33,7 +33,7 @@ struct sockaddr_in sc_new_socket_adress_client() {
 }
 
 /**
- * function: sc_new_socket_data
+ * function: sc_new_socket_data_server
  * Create a socketdata_t ADT with the default socket configuration (IPV4, Port 5000)
  */
 socketdata_t sc_new_socket_data_server(){
@@ -47,7 +47,7 @@ socketdata_t sc_new_socket_data_server(){
 }
 
 /**
- * function: sc_new_socket_data
+ * function: sc_new_socket_data_client
  * Create a socketdata_t ADT with the default socket configuration (IPV4, Port 5000)
  */
 socketdata_t sc_new_socket_data_client(){
