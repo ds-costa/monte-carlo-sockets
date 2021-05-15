@@ -11,6 +11,6 @@ int main(int argc, char **argv) {
     client_socket = sc_new_socket_data_client();
 
     sc_establish_client_connection(&client_socket);
-
+    close(client_socket.file_descriptor);
     return 0;
 }
