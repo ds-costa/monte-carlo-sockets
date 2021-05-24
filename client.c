@@ -19,8 +19,6 @@ int main(int argc, char **argv) {
 
     printf("client(%d)> %s\n", client_socket.file_descriptor, buffer);
     
-    //monte carlo
-    //conv_double_2_string(pi, buffer);
     pi = monte_carlo_pi(conv_string_2_double(buffer));
     conv_double_2_string(pi, buffer);
 
