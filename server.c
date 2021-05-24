@@ -22,7 +22,7 @@ double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes
     int i;
 
     for(i = 0; i < number_of_clients; i++) {
-        read(clients_pipes[i][0], buffer, sizeof(buffer)); //wait and read clients' result
+        pipe_read(clients_pipes[i], buffer); //wait and read clients' result
         printf("%lf\n", conv_string_2_double(buffer));
         sum += conv_string_2_double(buffer); 
     }
@@ -37,11 +37,11 @@ void close_all_tcp_handlers(int number_of_clients, int (*clients)[number_of_clie
     }
 }
 
-void close_read_mode_pipes(int number_of_clients, pipe_t (*clients_pipes)[2]) {
+void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of_clients][2]) {
     int i;
 
     for(i = 0; i < number_of_clients; i++) { //close all pipes
-        close(*(clients_pipes[i][0]));
+        pipe_close(*clients_pipes[i], PIPE_READ);
     }
 }
 
@@ -58,7 +58,7 @@ void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_cl
             (struct sockaddr *)&newAddr, 
             &addr_size 
         );
-        pipe(clients_pipes[i]);
+        pipe_init(clients_pipes[i]);
 
         printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
     }
@@ -66,21 +66,18 @@ void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_cl
 
 int main(int argc, char **argv) {
  
-    socketdata_t server_socket;      
+    char buffer[MAX_BUFFER_LENGTH];
     
+    double sum = 0.0;
+    
+    int i;
     int number_of_clients = 4;
     unsigned long number_points = 1000000;
 
-    int clients[number_of_clients];
-    pipe_t clients_pipes[number_of_clients];
-
-    //aux variables
-    int i;
-    double sum = 0.0;
-    
-    char buffer[MAX_BUFFER_LENGTH];
-
     pid_t child_pid;
+    socketdata_t server_socket;      
+    pipe_t clients_pipes[number_of_clients];
+    int clients[number_of_clients];
 
     server_socket = sc_new_socket_data_server();
     sc_activate_listener_mode(&server_socket);
@@ -92,14 +89,13 @@ int main(int argc, char **argv) {
             perror("[-]Fork error\n");
         }
         else if(child_pid != 0) { //parent
-            close(clients_pipes[i][1]); //read only
+            pipe_close(clients_pipes[i], PIPE_WRITE); //read only
         }
         else { //child
-            close(clients_pipes[i][0]); //writing only
-            handle_tcp_connection(number_points, buffer, clients[i]);
-            
-            write(clients_pipes[i][1], &buffer, strlen(buffer)+1); //writes client's result in pipe
-            close(clients_pipes[i][1]);
+            pipe_close(clients_pipes[i], PIPE_READ); //writing only
+            handle_tcp_connection(number_points, buffer, clients[i]);            
+            pipe_write(clients_pipes[i], buffer); //writes client's result in pipe
+            pipe_close(clients_pipes[i], PIPE_WRITE);
             exit(0);
         }
     }
