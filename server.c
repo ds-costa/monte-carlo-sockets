@@ -6,6 +6,7 @@
 #include "src/socketconfig.h"
 #include "src/convert.h"
 #include "src/data.h"
+#include "src/pipe.h"
 
 void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor) { 
     printf("[+]Handle TCP client\n");

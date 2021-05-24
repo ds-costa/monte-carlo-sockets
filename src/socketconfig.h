@@ -23,7 +23,7 @@
 #define MAX_BUFFER_LENGTH 1024 // 1kb
 #define HOME_IP "127.0.0.1"
 
-typedef int pipe_t[2];
+
 typedef struct {
     //[!] need to add structure to keep following the client 
     struct sockaddr_in address;
