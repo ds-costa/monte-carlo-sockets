@@ -70,14 +70,29 @@ int main(int argc, char **argv) {
     
     double sum = 0.0;
     
-    int i;
-    int number_of_clients = 4;
-    unsigned long number_points = 1000000;
+    int i, n;
+    int number_of_clients;
+    unsigned long number_points;
 
     pid_t child_pid;
     socketdata_t server_socket;      
-    pipe_t clients_pipes[number_of_clients];
+
+    // 3 <= n <= 10
+    //clients: 2, 4, 8, 16
+    printf("Number of Clients(2 | 4 | 8 | 16): ");
+    scanf("%d", &number_of_clients);
+
     int clients[number_of_clients];
+    pipe_t clients_pipes[number_of_clients];
+
+    printf("Number of points(3 <= n <= 10): 10^");
+    scanf("%d", &n);
+
+    number_points = pow(10, n);
+    number_points /= number_of_clients;
+
+    printf("%d\n", number_of_clients);
+    printf("%lu\n", number_points);
 
     server_socket = sc_new_socket_data_server();
     sc_activate_listener_mode(&server_socket);
