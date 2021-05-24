@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
     int i;
     double sum = 0.0;
     
-    char buffer[1014];
+    char buffer[MAX_BUFFER_LENGTH];
 
     pid_t child_pid;
 
