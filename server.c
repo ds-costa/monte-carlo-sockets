@@ -18,12 +18,12 @@ void handle_tcp_connection(unsigned long number_points, char* buffer, int file_d
 }
 
 double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes, char* buffer) {
-    double sum;
+    double sum = 0.0;
     int i;
 
     for(i = 0; i < number_of_clients; i++) {
         pipe_read(clients_pipes[i], buffer); //wait and read clients' result
-        printf("%lf\n", conv_string_2_double(buffer));
+        printf("%.10lf\n", conv_string_2_double(buffer));
         sum += conv_string_2_double(buffer); 
     }
     return sum;
