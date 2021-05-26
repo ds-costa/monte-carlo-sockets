@@ -7,6 +7,7 @@
 #include "src/convert.h"
 #include "src/data.h"
 #include "src/pipe.h"
+#include "src/exectime.h"
 
 void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor) { 
     printf("[+]Handle TCP client\n");
@@ -23,7 +24,7 @@ double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes
 
     for(i = 0; i < number_of_clients; i++) {
         pipe_read(clients_pipes[i], buffer); //wait and read clients' result
-        printf("%.10lf\n", conv_string_2_double(buffer));
+        // printf("%.10lf\n", conv_string_2_double(buffer));
         sum += conv_string_2_double(buffer); 
     }
     return sum;
@@ -75,7 +76,17 @@ int main(int argc, char **argv) {
     unsigned long number_points;
 
     pid_t child_pid;
-    socketdata_t server_socket;      
+    socketdata_t server_socket;  
+
+
+    // Time values
+    bool is_measuring_time = (argc > 1 && strcmp(argv[1], "timer") == 0);
+    timespec start = {0, 0};
+    timespec end = {0, 0};
+    uint64_t start_ns = 0;
+    uint64_t end_ns = 0;
+    int64_t elapsed_time = 0;
+    //     
 
     // 3 <= n <= 10
     //clients: 2, 4, 8, 16
@@ -96,6 +107,12 @@ int main(int argc, char **argv) {
     
     initilize_and_connect_clients(&server_socket, number_of_clients, clients, clients_pipes);
     //start measuring time
+    if(is_measuring_time == true) {
+        clock_gettime(CLOCK_MONOTONIC, &start);
+    }
+
+   
+   
     for(i = 0; i < number_of_clients; i++) {
         if((child_pid = fork()) < 0) {
             perror("[-]Fork error\n");
@@ -114,8 +131,21 @@ int main(int argc, char **argv) {
 
     sum = wait_and_sum_clients_results(number_of_clients, clients_pipes, buffer);
     sum /= number_of_clients;
+    double pi = sum;
     //stop measuring time
-    printf("\nPI: %.10lf\n", sum);
+    if(is_measuring_time == true) {
+        clock_gettime(CLOCK_MONOTONIC, &end);
+
+        start_ns = exectime_timespec_to_nanosconds(start);
+        end_ns = exectime_timespec_to_nanosconds(end);
+        elapsed_time = end_ns - start_ns;
+    
+        printf("server(monte_carlo: start)> %luns\n", start_ns);
+        printf("server(monte_carlo: end)> %luns\n", end_ns);
+        printf("server(monte_carlo: elapsed_time)> %ldns\n", elapsed_time);
+    }
+    printf("server(aproximation)> %.10lf\n", pi);
+    printf("server(error)> %g\n", fabs(M_PI - pi));
     
     close_all_tcp_handlers(number_of_clients, &clients);
     close_read_mode_pipes(number_of_clients, &clients_pipes);
