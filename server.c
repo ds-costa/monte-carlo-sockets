@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
 
 
     // Time values
-    bool is_measuring_time = (argc > 1 && strcmp(argv[1], "timer") == 0);
+    bool is_measuring_time = (argc > 1 && strcmp(argv[1], "--exectime") == 0);
     timespec start = {0, 0};
     timespec end = {0, 0};
     uint64_t start_ns = 0;

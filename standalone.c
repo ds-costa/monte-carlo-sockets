@@ -19,18 +19,20 @@ int main(int argc, char **argv) {
     srand(SEED);
     
     // Time values
-    bool is_measuring_time = (argc > 2 && strcmp(argv[2], "timer") == 0);
+    bool is_measuring_time = (argc > 1 && strcmp(argv[1], "--exectime") == 0);
     timespec start = {0, 0};
     timespec end = {0, 0};
     uint64_t start_ns = 0;
     uint64_t end_ns = 0;
     int64_t elapsed_time = 0;
     // 
-
+    int n;
     printf("== Standalone Implementation ==\n");
-    
-    unsigned long total_points = (argc > 1) ? atoi(argv[1]) : 0;
+    printf("Number of points(3 <= n <= 10): 10^");
+    scanf("%d", &n);
 
+    
+    unsigned long total_points = pow(10, n);
     if(is_measuring_time == true) {
         clock_gettime(CLOCK_MONOTONIC, &start);
     }
