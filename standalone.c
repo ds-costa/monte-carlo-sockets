@@ -8,16 +8,47 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
+#include <stdbool.h>
 #include "src/montecarlo.h"
+#include "src/exectime.h"
 
 
 int main(int argc, char **argv) {
     
     srand(SEED);
+    
+    // Time values
+    bool is_measuring_time = (argc > 2 && strcmp(argv[2], "timer") == 0);
+    timespec start = {0, 0};
+    timespec end = {0, 0};
+    uint64_t start_ns = 0;
+    uint64_t end_ns = 0;
+    int64_t elapsed_time = 0;
+    // 
+
     printf("== Standalone Implementation ==\n");
     
     unsigned long total_points = (argc > 1) ? atoi(argv[1]) : 0;
+
+    if(is_measuring_time == true) {
+        clock_gettime(CLOCK_MONOTONIC, &start);
+    }
+
     double pi = monte_carlo_pi(total_points);
+
+    if(is_measuring_time == true) {
+        clock_gettime(CLOCK_MONOTONIC, &end);
+
+        start_ns = exectime_timespec_to_nanosconds(start);
+        end_ns = exectime_timespec_to_nanosconds(end);
+        elapsed_time = end_ns - start_ns;
+    
+        printf("monte_carlo> start: %luns\n", start_ns);
+        printf("monte_carlo> end: %luns\n", end_ns);
+        printf("monte_carlo> elapsed_time: %ldns\n", elapsed_time);
+    }
+
 
     printf("monte_carlo> Aproximation: %.10lf\n", pi);
     printf("monte_carlo> Error: %g\n", fabs(M_PI - pi));
