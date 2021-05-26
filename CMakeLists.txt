@@ -10,6 +10,7 @@ add_library(montecarlo src/montecarlo.c)
 add_library(data src/data.c)
 
 
+
 add_executable(client client.c)
 add_executable(server server.c)
 add_executable(standalone standalone.c)

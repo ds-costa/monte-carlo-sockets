@@ -4,6 +4,11 @@
 #include <time.h>
 #include "montecarlo.h"
 
+/**
+ * function: monte_carlo_pi
+ * Monte Carlo PI computation method implementation
+ * @param total_points, Number of random points to be generated
+ */
 double monte_carlo_pi(unsigned long total_points) {
     
     unsigned long points_inside_circle = 0;
