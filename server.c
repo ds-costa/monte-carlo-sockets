@@ -91,14 +91,11 @@ int main(int argc, char **argv) {
     number_points = pow(10, n);
     number_points /= number_of_clients;
 
-    printf("%d\n", number_of_clients);
-    printf("%lu\n", number_points);
-
     server_socket = sc_new_socket_data_server();
     sc_activate_listener_mode(&server_socket);
     
     initilize_and_connect_clients(&server_socket, number_of_clients, clients, clients_pipes);
-
+    //start measuring time
     for(i = 0; i < number_of_clients; i++) {
         if((child_pid = fork()) < 0) {
             perror("[-]Fork error\n");
@@ -117,7 +114,7 @@ int main(int argc, char **argv) {
 
     sum = wait_and_sum_clients_results(number_of_clients, clients_pipes, buffer);
     sum /= number_of_clients;
-
+    //stop measuring time
     printf("\nPI: %.10lf\n", sum);
     
     close_all_tcp_handlers(number_of_clients, &clients);
