@@ -20,11 +20,11 @@ typedef int pipe_t[2];
 }
 
 #define pipe_read(pipe_, buffer) {\
-    read(pipe_[PIPE_READ], buffer, sizeof(buffer)); \
+    read(pipe_[PIPE_READ], buffer, MAX_BUFFER_LENGTH); \
 }
 
 #define pipe_write(pipe_, buffer) {\
-    write(pipe_[PIPE_WRITE], &buffer, strlen(buffer) + 1); \
+    write(pipe_[PIPE_WRITE], &buffer, MAX_BUFFER_LENGTH); \
 }
 
 #endif
