@@ -10,7 +10,7 @@
 #include "src/exectime.h"
 
 void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor) { 
-    printf("[+]Handle TCP client\n");
+//    printf("[+]Handle TCP client\n");
     
     conv_ulong_2_string(number_points, buffer);
 
@@ -52,7 +52,7 @@ void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_cl
     socklen_t addr_size = sizeof(newAddr);  
 
     for(i = 0; i < number_of_clients; i++) {
-        system("./client &");
+        system("./build/client &");
         
         clients[i] = accept(
             server_socket->file_descriptor, 
@@ -61,7 +61,7 @@ void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_cl
         );
         pipe_init(clients_pipes[i]);
 
-        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
+        // printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
     }
 }
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
 
 
     // Time values
-    bool is_measuring_time = (argc > 1 && strcmp(argv[1], "--exectime") == 0);
+    bool is_measuring_time = (argc > 3 && strcmp(argv[3], "--exectime") == 0);
     timespec start = {0, 0};
     timespec end = {0, 0};
     uint64_t start_ns = 0;
@@ -90,14 +90,16 @@ int main(int argc, char **argv) {
 
     // 3 <= n <= 10
     //clients: 2, 4, 8, 16
-    printf("Number of Clients(2 | 4 | 8 | 16): ");
-    scanf("%d", &number_of_clients);
+    //printf("Number of Clients(2 | 4 | 8 | 16): ");
+    //scanf("%d", &number_of_clients);
+    number_of_clients = (argc > 3) ? (int) conv_string_2_ulong(argv[1]) : 0;
 
     int clients[number_of_clients];
     pipe_t clients_pipes[number_of_clients];
 
-    printf("Number of points(3 <= n <= 10): 10^");
-    scanf("%d", &n);
+    //printf("Number of points(3 <= n <= 10): 10^");
+    //scanf("%d", &n);
+    n = (argc > 3) ? (int) conv_string_2_ulong(argv[2]) : 0;
 
     number_points = pow(10, n);
     number_points /= number_of_clients;
@@ -115,7 +117,7 @@ int main(int argc, char **argv) {
    
     for(i = 0; i < number_of_clients; i++) {
         if((child_pid = fork()) < 0) {
-            perror("[-]Fork error\n");
+            //perror("[-]Fork error\n");
         }
         else if(child_pid != 0) { //parent
             pipe_close(clients_pipes[i], PIPE_WRITE); //read only
@@ -131,7 +133,7 @@ int main(int argc, char **argv) {
 
     sum = wait_and_sum_clients_results(number_of_clients, clients_pipes, buffer);
     sum /= number_of_clients;
-    double pi = sum;
+    // double pi = sum;
     //stop measuring time
     if(is_measuring_time == true) {
         clock_gettime(CLOCK_MONOTONIC, &end);
@@ -140,12 +142,14 @@ int main(int argc, char **argv) {
         end_ns = exectime_timespec_to_nanosconds(end);
         elapsed_time = end_ns - start_ns;
     
-        printf("server(monte_carlo: start)> %luns\n", start_ns);
-        printf("server(monte_carlo: end)> %luns\n", end_ns);
-        printf("server(monte_carlo: elapsed_time)> %ldns\n", elapsed_time);
+        //printf("server(monte_carlo: start)> %luns\n", start_ns);
+        //printf("server(monte_carlo: end)> %luns\n", end_ns);
+        //printf("server(monte_carlo: elapsed_time)> %ldns\n", elapsed_time);
+        printf("%ld\n", (long int) elapsed_time);
+    
     }
-    printf("server(aproximation)> %.10lf\n", pi);
-    printf("server(error)> %g\n", fabs(M_PI - pi));
+    //printf("server(aproximation)> %.10lf\n", pi);
+    //printf("server(error)> %g\n", fabs(M_PI - pi));
     
     close_all_tcp_handlers(number_of_clients, &clients);
     close_read_mode_pipes(number_of_clients, &clients_pipes);

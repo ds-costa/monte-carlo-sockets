@@ -17,10 +17,10 @@ int main(int argc, char **argv) {
     srand(SEED + client_socket.file_descriptor * 100000); //making each client have different seeds
     data_receive(client_socket.file_descriptor, buffer);
 
-    printf("client(%d: points)> %s\n", client_socket.file_descriptor, buffer);
+    // printf("client(%d: points)> %s\n", client_socket.file_descriptor, buffer);
     
     pi = monte_carlo_pi(conv_string_2_double(buffer));
-    printf("client(%d: result)> %.10lf\n", client_socket.file_descriptor, pi);
+    // printf("client(%d: result)> %.10lf\n", client_socket.file_descriptor, pi);
 
     conv_double_2_string(pi, buffer);
 
