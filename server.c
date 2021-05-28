@@ -80,26 +80,28 @@ int main(int argc, char **argv) {
 
 
     // Time values
-    bool is_measuring_time = (argc > 3 && strcmp(argv[3], "--exectime") == 0);
     timespec start = {0, 0};
     timespec end = {0, 0};
-    uint64_t start_ns = 0;
-    uint64_t end_ns = 0;
-    int64_t elapsed_time = 0;
+    unsigned long int start_ns = 0;
+    unsigned long int end_ns = 0;
+    long int elapsed_time = 0;
+    // printf("%d\n", is_measuring_time);
     //     
 
     // 3 <= n <= 10
     //clients: 2, 4, 8, 16
     //printf("Number of Clients(2 | 4 | 8 | 16): ");
     //scanf("%d", &number_of_clients);
-    number_of_clients = (argc > 3) ? (int) conv_string_2_ulong(argv[1]) : 0;
+    number_of_clients = (int) conv_string_2_ulong(argv[1]);
+    // printf("%d\n", number_of_clients);
 
     int clients[number_of_clients];
     pipe_t clients_pipes[number_of_clients];
 
     //printf("Number of points(3 <= n <= 10): 10^");
     //scanf("%d", &n);
-    n = (argc > 3) ? (int) conv_string_2_ulong(argv[2]) : 0;
+    n = (int) conv_string_2_ulong(argv[2]);
+    // printf("%d\n", n);
 
     number_points = pow(10, n);
     number_points /= number_of_clients;
@@ -108,10 +110,7 @@ int main(int argc, char **argv) {
     sc_activate_listener_mode(&server_socket);
     
     initilize_and_connect_clients(&server_socket, number_of_clients, clients, clients_pipes);
-    //start measuring time
-    if(is_measuring_time == true) {
-        clock_gettime(CLOCK_MONOTONIC, &start);
-    }
+    clock_gettime(CLOCK_MONOTONIC, &start);
 
    
    
@@ -133,24 +132,25 @@ int main(int argc, char **argv) {
 
     sum = wait_and_sum_clients_results(number_of_clients, clients_pipes, buffer);
     sum /= number_of_clients;
-    // double pi = sum;
-    //stop measuring time
-    if(is_measuring_time == true) {
-        clock_gettime(CLOCK_MONOTONIC, &end);
 
-        start_ns = exectime_timespec_to_nanosconds(start);
-        end_ns = exectime_timespec_to_nanosconds(end);
-        elapsed_time = end_ns - start_ns;
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    start_ns = exectime_timespec_to_nanosconds(start);
+    end_ns = exectime_timespec_to_nanosconds(end);
+    elapsed_time = end_ns - start_ns;
     
-        //printf("server(monte_carlo: start)> %luns\n", start_ns);
-        //printf("server(monte_carlo: end)> %luns\n", end_ns);
-        //printf("server(monte_carlo: elapsed_time)> %ldns\n", elapsed_time);
-        printf("%ld\n", (long int) elapsed_time);
     
-    }
-    //printf("server(aproximation)> %.10lf\n", pi);
-    //printf("server(error)> %g\n", fabs(M_PI - pi));
-    
+    fflush(stdout);
+    char out[1000];
+    conv_ulong_2_string(elapsed_time, out);
+    FILE *fp = fopen("time_out.txt", "a");
+    FILE *fp2 = fopen("pi_out.txt", "a");
+    fprintf(fp, "%s\n", out);
+    fprintf(fp2, "%.10lf\n", sum);
+    fclose(fp);
+    fclose(fp2);
+
+
     close_all_tcp_handlers(number_of_clients, &clients);
     close_read_mode_pipes(number_of_clients, &clients_pipes);
 

@@ -18,7 +18,7 @@ add_executable(standalone standalone.c)
 
 target_link_libraries(client socketconfig convert data montecarlo -lm)
 target_link_libraries(server socketconfig convert data montecarlo -lm)
-target_link_libraries(standalone montecarlo -lm)
+target_link_libraries(standalone convert montecarlo -lm)
 
 if (WIN32)
     target_link_libraries(MonteCarloSockets -lwsock32)

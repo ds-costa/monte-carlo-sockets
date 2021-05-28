@@ -3,6 +3,8 @@
 build
 /build
 main
+test
+test_standalone
 
 # Created by https://www.gitignore.io/api/c,code
 # Edit at https://www.gitignore.io/?templates=c,code
