@@ -127,7 +127,6 @@ double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes
 
     for(i = 0; i < number_of_clients; i++) {
         pipe_read(clients_pipes[i], buffer); //wait and read clients' result
-        // printf("%.10lf\n", conv_string_2_double(buffer));
         sum += conv_string_2_double(buffer); 
     }
     return sum;
