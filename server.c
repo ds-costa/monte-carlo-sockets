@@ -7,75 +7,43 @@
 #include "src/convert.h"
 #include "src/data.h"
 #include "src/pipe.h"
+#include "src/exectime.h"
 
-void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor) { 
-    printf("[+]Handle TCP client\n");
-    
-    conv_ulong_2_string(number_points, buffer);
+//start clients' process and connect them to server
+void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t *clients_pipes); 
+//send and wait client's message
+void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor); 
+//wait client's message be written in server's pipe
+double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes, char* buffer); 
+//close read mode of all pipes
+void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of_clients][2]); 
+//close all sockets tcp handlers
+void close_all_tcp_handlers(int number_of_clients, int (*clients)[number_of_clients]); 
 
-    data_send(file_descriptor, buffer);
-    data_receive(file_descriptor, buffer);
-}
-
-double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes, char* buffer) {
-    double sum = 0.0;
-    int i;
-
-    for(i = 0; i < number_of_clients; i++) {
-        pipe_read(clients_pipes[i], buffer); //wait and read clients' result
-        printf("%.10lf\n", conv_string_2_double(buffer));
-        sum += conv_string_2_double(buffer); 
-    }
-    return sum;
-}
-
-void close_all_tcp_handlers(int number_of_clients, int (*clients)[number_of_clients]) {
-    int i;
-
-    for(i = 0; i < number_of_clients; i++) { //close all sockets tcp handlers
-        close(*(clients[i]));
-    }
-}
-
-void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of_clients][2]) {
-    int i;
-
-    for(i = 0; i < number_of_clients; i++) { //close all pipes
-        pipe_close(*clients_pipes[i], PIPE_READ);
-    }
-}
-
-void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t* clients_pipes) {
-    int i;
-    struct sockaddr_in newAddr;
-    socklen_t addr_size = sizeof(newAddr);  
-
-    for(i = 0; i < number_of_clients; i++) {
-        system("./client &");
-        
-        clients[i] = accept(
-            server_socket->file_descriptor, 
-            (struct sockaddr *)&newAddr, 
-            &addr_size 
-        );
-        pipe_init(clients_pipes[i]);
-
-        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
-    }
-}
 
 int main(int argc, char **argv) {
  
     char buffer[MAX_BUFFER_LENGTH];
     
     double sum = 0.0;
+    double pi = 0.0; 
     
     int i, n;
     int number_of_clients;
     unsigned long number_points;
 
     pid_t child_pid;
-    socketdata_t server_socket;      
+    socketdata_t server_socket;  
+
+
+    // Time values
+    bool is_measuring_time = (argc > 1 && strcmp(argv[1], "--exectime") == 0);
+    timespec start = {0, 0};
+    timespec end = {0, 0};
+    uint64_t start_ns = 0;
+    uint64_t end_ns = 0;
+    int64_t elapsed_time = 0;
+    //     
 
     // 3 <= n <= 10
     //clients: 2, 4, 8, 16
@@ -96,6 +64,12 @@ int main(int argc, char **argv) {
     
     initilize_and_connect_clients(&server_socket, number_of_clients, clients, clients_pipes);
     //start measuring time
+    if(is_measuring_time == true) {
+        clock_gettime(CLOCK_MONOTONIC, &start);
+    }
+
+   
+   
     for(i = 0; i < number_of_clients; i++) {
         if((child_pid = fork()) < 0) {
             perror("[-]Fork error\n");
@@ -114,8 +88,21 @@ int main(int argc, char **argv) {
 
     sum = wait_and_sum_clients_results(number_of_clients, clients_pipes, buffer);
     sum /= number_of_clients;
+    pi = sum;
     //stop measuring time
-    printf("\nPI: %.10lf\n", sum);
+    if(is_measuring_time == true) {
+        clock_gettime(CLOCK_MONOTONIC, &end);
+
+        start_ns = exectime_timespec_to_nanosconds(start);
+        end_ns = exectime_timespec_to_nanosconds(end);
+        elapsed_time = end_ns - start_ns;
+    
+        printf("server(monte_carlo: start)> %luns\n", start_ns);
+        printf("server(monte_carlo: end)> %luns\n", end_ns);
+        printf("server(monte_carlo: elapsed_time)> %ldns\n", elapsed_time);
+    }
+    printf("server(aproximation)> %.10lf\n", pi);
+    printf("server(error)> %g\n", fabs(M_PI - pi));
     
     close_all_tcp_handlers(number_of_clients, &clients);
     close_read_mode_pipes(number_of_clients, &clients_pipes);
@@ -123,4 +110,58 @@ int main(int argc, char **argv) {
     close(server_socket.file_descriptor); //close parent server process
     
     return 0;
+}
+
+void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t* clients_pipes) {
+    int i;
+    struct sockaddr_in newAddr;
+    socklen_t addr_size = sizeof(newAddr);  
+
+    for(i = 0; i < number_of_clients; i++) {
+        system("./client &"); //start one client process
+        
+        clients[i] = accept(
+            server_socket->file_descriptor, 
+            (struct sockaddr *)&newAddr, 
+            &addr_size 
+        ); //connect client to server
+        pipe_init(clients_pipes[i]);
+
+        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
+    }
+}
+void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor) { 
+    printf("[+]Handle TCP client\n");
+    
+    conv_ulong_2_string(number_points, buffer);
+
+    data_send(file_descriptor, buffer);
+    data_receive(file_descriptor, buffer);
+}
+
+double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes, char* buffer) {
+    double sum = 0.0;
+    int i;
+
+    for(i = 0; i < number_of_clients; i++) {
+        pipe_read(clients_pipes[i], buffer); //wait and read clients' result
+        sum += conv_string_2_double(buffer); 
+    }
+    return sum;
+}
+
+void close_all_tcp_handlers(int number_of_clients, int (*clients)[number_of_clients]) {
+    int i;
+
+    for(i = 0; i < number_of_clients; i++) { //close all sockets tcp handlers
+        close(*(clients[i]));
+    }
+}
+
+void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of_clients][2]) {
+    int i;
+
+    for(i = 0; i < number_of_clients; i++) { //close all pipes
+        pipe_close(*clients_pipes[i], PIPE_READ);
+    }
 }
