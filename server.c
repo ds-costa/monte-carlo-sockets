@@ -9,12 +9,12 @@
 #include "src/pipe.h"
 #include "src/exectime.h"
 
+//start clients' process and connect them to server
+void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t *clients_pipes); 
 //send and wait client's message
 void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor); 
 //wait client's message be written in server's pipe
 double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes, char* buffer); 
-//start clients' process and connect them to server
-void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t *clients_pipes); 
 //close read mode of all pipes
 void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of_clients][2]); 
 //close all sockets tcp handlers
@@ -112,6 +112,24 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t* clients_pipes) {
+    int i;
+    struct sockaddr_in newAddr;
+    socklen_t addr_size = sizeof(newAddr);  
+
+    for(i = 0; i < number_of_clients; i++) {
+        system("./client &");
+        
+        clients[i] = accept(
+            server_socket->file_descriptor, 
+            (struct sockaddr *)&newAddr, 
+            &addr_size 
+        );
+        pipe_init(clients_pipes[i]);
+
+        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
+    }
+}
 void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor) { 
     printf("[+]Handle TCP client\n");
     
@@ -145,24 +163,5 @@ void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of
 
     for(i = 0; i < number_of_clients; i++) { //close all pipes
         pipe_close(*clients_pipes[i], PIPE_READ);
-    }
-}
-
-void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t* clients_pipes) {
-    int i;
-    struct sockaddr_in newAddr;
-    socklen_t addr_size = sizeof(newAddr);  
-
-    for(i = 0; i < number_of_clients; i++) {
-        system("./client &");
-        
-        clients[i] = accept(
-            server_socket->file_descriptor, 
-            (struct sockaddr *)&newAddr, 
-            &addr_size 
-        );
-        pipe_init(clients_pipes[i]);
-
-        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
     }
 }
