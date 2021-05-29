@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
     char buffer[MAX_BUFFER_LENGTH];
     
     double sum = 0.0;
+    double pi = 0.0; 
     
     int i, n;
     int number_of_clients;
@@ -87,7 +88,7 @@ int main(int argc, char **argv) {
 
     sum = wait_and_sum_clients_results(number_of_clients, clients_pipes, buffer);
     sum /= number_of_clients;
-    double pi = sum;
+    pi = sum;
     //stop measuring time
     if(is_measuring_time == true) {
         clock_gettime(CLOCK_MONOTONIC, &end);
