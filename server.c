@@ -118,13 +118,13 @@ void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_cl
     socklen_t addr_size = sizeof(newAddr);  
 
     for(i = 0; i < number_of_clients; i++) {
-        system("./client &");
+        system("./client &"); //start one client process
         
         clients[i] = accept(
             server_socket->file_descriptor, 
             (struct sockaddr *)&newAddr, 
             &addr_size 
-        );
+        ); //connect client to server
         pipe_init(clients_pipes[i]);
 
         printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
