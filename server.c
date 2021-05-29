@@ -9,61 +9,17 @@
 #include "src/pipe.h"
 #include "src/exectime.h"
 
-void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor) { 
-    printf("[+]Handle TCP client\n");
-    
-    conv_ulong_2_string(number_points, buffer);
+//send and wait client's message
+void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor); 
+//wait client's message be written in server's pipe
+double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes, char* buffer); 
+//start clients' process and connect them to server
+void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t *clients_pipes); 
+//close read mode of all pipes
+void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of_clients][2]); 
+//close all sockets tcp handlers
+void close_all_tcp_handlers(int number_of_clients, int (*clients)[number_of_clients]); 
 
-    data_send(file_descriptor, buffer);
-    data_receive(file_descriptor, buffer);
-}
-
-double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes, char* buffer) {
-    double sum = 0.0;
-    int i;
-
-    for(i = 0; i < number_of_clients; i++) {
-        pipe_read(clients_pipes[i], buffer); //wait and read clients' result
-        // printf("%.10lf\n", conv_string_2_double(buffer));
-        sum += conv_string_2_double(buffer); 
-    }
-    return sum;
-}
-
-void close_all_tcp_handlers(int number_of_clients, int (*clients)[number_of_clients]) {
-    int i;
-
-    for(i = 0; i < number_of_clients; i++) { //close all sockets tcp handlers
-        close(*(clients[i]));
-    }
-}
-
-void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of_clients][2]) {
-    int i;
-
-    for(i = 0; i < number_of_clients; i++) { //close all pipes
-        pipe_close(*clients_pipes[i], PIPE_READ);
-    }
-}
-
-void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t* clients_pipes) {
-    int i;
-    struct sockaddr_in newAddr;
-    socklen_t addr_size = sizeof(newAddr);  
-
-    for(i = 0; i < number_of_clients; i++) {
-        system("./client &");
-        
-        clients[i] = accept(
-            server_socket->file_descriptor, 
-            (struct sockaddr *)&newAddr, 
-            &addr_size 
-        );
-        pipe_init(clients_pipes[i]);
-
-        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
-    }
-}
 
 int main(int argc, char **argv) {
  
@@ -153,4 +109,60 @@ int main(int argc, char **argv) {
     close(server_socket.file_descriptor); //close parent server process
     
     return 0;
+}
+
+void handle_tcp_connection(unsigned long number_points, char* buffer, int file_descriptor) { 
+    printf("[+]Handle TCP client\n");
+    
+    conv_ulong_2_string(number_points, buffer);
+
+    data_send(file_descriptor, buffer);
+    data_receive(file_descriptor, buffer);
+}
+
+double wait_and_sum_clients_results(int number_of_clients, pipe_t* clients_pipes, char* buffer) {
+    double sum = 0.0;
+    int i;
+
+    for(i = 0; i < number_of_clients; i++) {
+        pipe_read(clients_pipes[i], buffer); //wait and read clients' result
+        // printf("%.10lf\n", conv_string_2_double(buffer));
+        sum += conv_string_2_double(buffer); 
+    }
+    return sum;
+}
+
+void close_all_tcp_handlers(int number_of_clients, int (*clients)[number_of_clients]) {
+    int i;
+
+    for(i = 0; i < number_of_clients; i++) { //close all sockets tcp handlers
+        close(*(clients[i]));
+    }
+}
+
+void close_read_mode_pipes(int number_of_clients, pipe_t clients_pipes[number_of_clients][2]) {
+    int i;
+
+    for(i = 0; i < number_of_clients; i++) { //close all pipes
+        pipe_close(*clients_pipes[i], PIPE_READ);
+    }
+}
+
+void initilize_and_connect_clients(socketdata_t* server_socket, int number_of_clients, int *clients, pipe_t* clients_pipes) {
+    int i;
+    struct sockaddr_in newAddr;
+    socklen_t addr_size = sizeof(newAddr);  
+
+    for(i = 0; i < number_of_clients; i++) {
+        system("./client &");
+        
+        clients[i] = accept(
+            server_socket->file_descriptor, 
+            (struct sockaddr *)&newAddr, 
+            &addr_size 
+        );
+        pipe_init(clients_pipes[i]);
+
+        printf("[+]Receiving connection (Client: %s , Port: %d)\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
+    }
 }

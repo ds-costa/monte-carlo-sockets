@@ -43,8 +43,8 @@ $build> make
 ```
 - Execute the compiled project.
 ```bash
-$> ./build/server
-$> ./build/client 
+$> ./server
+$> ./client 
 ```
 
 ## Authors
